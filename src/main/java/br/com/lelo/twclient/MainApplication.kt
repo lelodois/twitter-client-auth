@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @SpringBootApplication
 @ComponentScan("br.com.lelo.twclient.*")
 @EntityScan("br.com.lelo.twclient.*")
+@EnableEu
 @EnableScheduling
 open class MainApplication {
     companion object {

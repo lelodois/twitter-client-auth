@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.crypto.password.PasswordEncoder
 
 
 @Configuration
@@ -21,13 +20,11 @@ open class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     private val authUserService: AuthUserService? = null
-    @Autowired
-    private val passwordEncoder: PasswordEncoder? = null
 
     @Throws(Exception::class)
     override fun configure(auth: AuthenticationManagerBuilder?) {
         auth!!.userDetailsService<AuthUserService>(authUserService)
-                .passwordEncoder(passwordEncoder)
+                .passwordEncoder(authUserService?.passwordEncoder())
     }
 
     @Bean

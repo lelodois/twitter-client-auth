@@ -3,4 +3,4 @@ spring:
     name: twitter-client-auth
   cloud:
     config:
-      uri: http://localhost:8055
+      uri: http://localhost:8050

@@ -12,6 +12,8 @@
 - Maven
 - Spring boot
 - Swagger
+- Oauth2
+- Flyway
 
 Em desenvolvimento...
 

@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.Ordered
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer
@@ -21,35 +24,37 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableAuthorizationServer
-open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapter() {
-
-    @Autowired
-    private val dataSource: DataSource? = null
+open class AuthorizationConfig : AuthorizationServerConfigurerAdapter() {
 
     @Value("\${oauth.secret}")
     private val secret: String? = null
 
     @Autowired
+    private var dataSource: DataSource? = null
+
+    @Autowired
     @Qualifier("authenticationManagerBean")
-    private val authenticationManager: AuthenticationManager? = null
+    private var authenticationManager: AuthenticationManager? = null
+
+    private var encoder: PasswordEncoder? = null
 
     @Bean
     open fun tokenStore(): JdbcTokenStore {
         return JdbcTokenStore(dataSource!!)
     }
 
-    override fun configure(endpoints: AuthorizationServerEndpointsConfigurer?) {
-        endpoints!!.authenticationManager(this.authenticationManager)
+    override fun configure(endpoints: AuthorizationServerEndpointsConfigurer) {
+        endpoints.authenticationManager(this.authenticationManager!!)
                 .tokenStore(tokenStore())
     }
 
     @Throws(Exception::class)
-    override fun configure(clients: ClientDetailsServiceConfigurer?) {
-        clients!!.jdbc(dataSource)
+    override fun configure(clients: ClientDetailsServiceConfigurer) {
+        clients.inMemory()
                 .withClient("twclient")
-                .authorizedGrantTypes("password,refresh_token")
+                .authorizedGrantTypes("authorization_code", "refresh_token", "password")
                 .authorities(*Authorities.names())
-                .resourceIds("resources")
+                .resourceIds("twclientresource")
                 .scopes("read,write")
                 .secret(secret)
                 .accessTokenValiditySeconds(3600)
@@ -66,9 +71,17 @@ open class AuthorizationServerConfiguration : AuthorizationServerConfigurerAdapt
         source.registerCorsConfiguration("/**", config)
 
         val bean = FilterRegistrationBean(CorsFilter(source))
-        bean.order = 0
+        bean.order = Ordered.HIGHEST_PRECEDENCE
         return bean
     }
 
+
+    @Bean
+    open fun passwordEncoder(): PasswordEncoder {
+        if (encoder == null) {
+            encoder = BCryptPasswordEncoder()
+        }
+        return encoder as PasswordEncoder
+    }
 
 }

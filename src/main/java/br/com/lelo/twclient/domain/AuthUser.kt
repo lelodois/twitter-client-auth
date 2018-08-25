@@ -1,6 +1,5 @@
 package br.com.lelo.twclient.domain
 
-import org.hibernate.validator.constraints.Email
 import javax.persistence.*
 import javax.validation.constraints.Size
 
@@ -14,10 +13,6 @@ class AuthUser {
 
     @Size(min = 0, max = 500)
     var password: String? = null
-
-    @Email
-    @Size(min = 0, max = 50)
-    var email: String? = null
 
     var activated: Boolean = false
 

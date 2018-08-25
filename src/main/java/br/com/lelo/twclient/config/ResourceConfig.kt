@@ -9,10 +9,10 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 
 @Configuration
 @EnableResourceServer
-open class ResourceServerConfiguration : ResourceServerConfigurerAdapter() {
+open class ResourceConfig : ResourceServerConfigurerAdapter() {
 
     override fun configure(resources: ResourceServerSecurityConfigurer?) {
-        resources!!.resourceId("")
+        resources!!.resourceId("twclientresource")
     }
 
     @Throws(Exception::class)
